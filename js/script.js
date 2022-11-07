@@ -1,3 +1,9 @@
+//requete à l'API 
+
+const API = ""
+
+
+
 //creation de <a>
 let linkProduct = document.createElement("a")
 
@@ -15,4 +21,3 @@ let titreProduct = document.createElement("h3")
 //creation de <p>
 
 let pProduct = document.createElement("p")
-
