@@ -4,26 +4,29 @@ const api = " http://localhost:3000/api/products";
 
 console.log(api);
 
+
+
+
 //récupération du résultat de la requete, 
 
-fetch(" http://localhost:3000/api/products") // Dans le cours, récuperer des données d'un service web !! 
+fetch(api) // recupère les données du service web    //type de requete GET 
 
-    .then(function(res) {
-    if (res.ok) {
-        return res.json();
+    .then(function(res) {                    // recupérer la requete au format JSON
+    if (res.ok) { 
+        return res.json();  
         }
     })
     .then(function(value) {
-        console.log(value); 
+        //console.log(value);                   //affiche le tableau sur la console
         
-        //mettre la boucle FOR pour les canapés ici !
+                                            //mettre la boucle FOR pour les canapés ici !
         
-        let product = document.getElementById("items")
+        let product = document.getElementById("items") // j'ai recuperé la liste items et je la met dans product
 
-            for (let i = 0; i < value.length; i++) {
+            for (let i = 0; i < value.length; i++) {  //longueur du tableau (debut, a la fin, à chaque boucle on augmente i une fois)
 
-                const productCard = `
-                    <a href="./product.html?id=${value[i]._id}">
+                product.innerHTML  +=  `    
+                    <a href="./product.html?id=${value[i]._id}">   
                         <article>
                             <img src="${value[i].imageUrl}" alt="${value[i].altTxt}" />
                             <h3 class="productName">${value[i].name}</h3>
@@ -32,7 +35,7 @@ fetch(" http://localhost:3000/api/products") // Dans le cours, récuperer des do
                     </a>
                 `;
 
-        product.innerHTML += productCard;
+    
 
         
        // <a href="./product.html?id=42">
@@ -43,11 +46,6 @@ fetch(" http://localhost:3000/api/products") // Dans le cours, récuperer des do
        // </article>
      // </a> -->
                 
-
-            
-
-
-            console.log("Passager embarqué !");
         }
 
 
@@ -56,8 +54,8 @@ fetch(" http://localhost:3000/api/products") // Dans le cours, récuperer des do
 
     })
     .catch(function(err) {
-        // Une erreur est survenue
-    });
+        console.log(err)   
+     });
 
 
 
