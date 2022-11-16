@@ -85,12 +85,13 @@ fetch(newurl)
 
   //ajout dans le panier
 
-  function addCanap (product) {
+  function addCanap (product, quantity) {
+        
     let canap = getCanap () ;
     //gerer la quantité
-    let foundProduct = canap.find(p => p.id == product.id == color.value);  //je cherche dans mon panier si il y a un id qui =  l'id du product et = color
+    let foundProduct = canap.find(p => p.id == product.id && color.value == p.color);  //je cherche dans mon panier si il y a un id qui =  l'id du product et = color
     if (foundProduct != undefined) {
-      foundProduct.quantity++ ;
+      foundProduct.quantity += quantity ;
     }
     else {
       product.quantity = 1 ;
