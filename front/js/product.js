@@ -6,6 +6,9 @@ console.log(productId);
 
 let newurl = "http://localhost:3000/api/products/" + productId ; 
 
+
+
+
 fetch(newurl)
 
 
@@ -16,6 +19,15 @@ fetch(newurl)
   })
 
   .then(function(value) {                      //La valeur 
+
+     //Event pour ajouter un canap
+    let addToCart = document.getElementById("addToCart");
+    //On rajoute l'évent click au bouton addToCart, et ça va call la fonction addCanap
+    addToCart.addEventListener("click", addCanap);
+    //Pour récup le canap dans la fonction addCanap
+    addToCart.item = productId;
+
+
     console.log(value);
 
 
@@ -34,7 +46,7 @@ fetch(newurl)
     descrip.innerText = `${value.description}`
 
 
-    let color = document.getElementById("colors")  
+    let color = document.getElementById("colors") ;
 
         for (let i = 0; i < value.colors.length; i++) {  
 
@@ -43,7 +55,6 @@ fetch(newurl)
                
             `;
 
-            console.log("Couleur choisie !");
         }
     
   })
@@ -59,79 +70,91 @@ fetch(newurl)
 
 
 
-//const elementClick = document.getElementById("addToCard") ;
-//elementClick.addEventListener ("click",function(event){
-
-//})
-
-
-
 
   //création de la fonction pour sauvegarder le produit dans un panier ! 
+function saveCanap (canap ) {  //on enregistre le tableau dans le local storage
+  localStorage.setItem("canap", JSON.stringify(canap)) ;   // transforme en chaine de caractère
+}
 
-  function saveCanap (canap ) {  //on enregistre le tableau dans le local storage
-    localStorage.setItem("canap", JSON.stringify(canap)) ;   // transforme en chaine de caractère
-  }
 
-  function getCanap() {
-    let canap = localStorage.getItem("canap")
-    if (canap == null) {
-      return []; //un tableau vide
-    } else {
-      return JSON.parse (canap);  //parse retransforme la chaine de caractère en objet 
-    }
-  }
+//création de la fonction pour supprimer le panier 
+function removeCanap (){
+  localStorage.removeItem("canap") ; 
+}
+
+
+//fonction pour récuperer les canapés enregistrés
+function getCanap() {
+  let canap = JSON.parse(localStorage.getItem("canap"))
+  console.log("hola" + canap);
+  if ( !canap ) { 
+    return []; //un tableau vide
+  } 
+  return canap;
+}
 
 
   //ajout dans le panier
 
-  function addCanap (product, quantity) {
-        
-    let canap = getCanap () ;
-    //gerer la quantité
-    let foundProduct = canap.find(p => p.id == product.id && color.value == p.color);  //je cherche dans mon panier si il y a un id qui =  l'id du product et = color
-    if (foundProduct != undefined) {
-      foundProduct.quantity += quantity ;
-    }
-    else {
-      product.quantity = 1 ;
-      canap.push(product);
-    }
+function addCanap (product, color, quantity) {
+//Ici on crée une interface, se sera l'ajout de la quantité ou de la couleur par l'utilisateur 
+  let itemCanap = {};
+    //On récup le canap en question
+  itemCanap.productId = product.currentTarget.item; //currentTarget Identifie la cible actuelle de l'évènement, lorsque l'évènement traverse le DOM
+    //On récup le nom du canap  
+  itemCanap.title = document.getElementById("title").innerHTML;
+    //On récup la quantité (transformé en nombre)
+  itemCanap.quantity = parseInt(document.getElementById("quantity").value);
+  //On recup le prix du canap
+  //itemCanap.price = parseInt(document.getElementById("price").innerHTML);
+    //On récup la liste de couleur
+
+  let colorItem = document.getElementById("colors");
+    //On récup la couleur sélectionnée
+  itemCanap.color = colorItem.options[colorItem.selectedIndex].value;
+
+  console.log('Save : Product : ' + JSON.stringify(itemCanap.productId));
+  console.log ('name          : ' + itemCanap.title) ;
+  console.log('QTÉ            : ' + itemCanap.quantity);
+  console.log('COLOR          : ' + itemCanap.color);
+
+  console.log(itemCanap);
+
+
     
-    saveCanap(canap) ;
-  }
+  let canapList = getCanap() ; // CanapList c'est ce qu'il y a deja de rentrer dans mon local storage 
+  console.log(canapList);
+  let foundProduct = canapList.findIndex(p => ((p.id === itemCanap.productId) && (p.color === itemCanap.color))); //je cherche dans mon panier si il y a un id qui =  l'id du product et = color // trouver l'index ! attention find
+  
+  console.log("bonjour" + JSON.stringify(canapList)) ; // BUG 
+  console.log(foundProduct) ;
+  console.log(itemCanap.quantity);
+    if (foundProduct != -1 )  {   //donc il y a des produit avec le meme ID et meme color
+      canapList[foundProduct].quantity += itemCanap.quantity ;  
+    }
+
+    else {
+      
+     // itemCanap.quantity === quantity ; 
+      // color === itemCanap.color ;  
+      
+      console.log ("hola" + itemCanap.quantity);
 
 
- //retirer un produit du panier 
- 
- function removeCanap (product){
-  let canap = getCanap (); // on recupere
-  canap = canap.filter (p => p.id != product.id); 
-  saveCanap(canap) ;
+      canapList.push( {
+        'id' : itemCanap.productId, 
+        'color' : itemCanap.color , 
+        'quantity' : itemCanap.quantity, 
+      });
+    }
+    console.log(canapList);
+  saveCanap(canapList) ;
+
 }
 
 
-//retirer de la quantité
 
-function changeQuantity (product,quantity) {
-  let canap = getCanap () ; 
-  let foundProduct = canap.find(p => p.id == product.id);  //je cherche dans mon panier si il y a un id qui = a l'id du product
-    if (foundProduct != undefined) {
-      foundProduct.quantity += quantity ;
-      if(foundProduct.quantity <=0 ){   //pour pas avoir une quantité negative
-        removeCanap (foundProduct);
-      } else{
-        saveCanap(canap);
-      }
-    }
-    
-  }
-//pour calcul de la quantité 
 
-//function getNumberProduct {
-  //let canap = getCanap () ;  // on recupere le panier 
 
-//}
-//pour le prix
 
-//function getTotalPrice
+ 
