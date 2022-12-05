@@ -59,7 +59,7 @@ fetch(api) // recupère les données du service web    //type de requete GET
                     <div class="cart__item__content__description">
                       <h2>${value[indexApi].name}</h2>
                       <p>${panier[i].color}</p>
-                      <p>${panier[i].quantity*value[indexApi].price}</p>  
+                      <p id="price">${panier[i].quantity*value[indexApi].price}</p>  
                     </div>
                     <div class="cart__item__content__settings">
                       <div class="cart__item__content__settings__quantity">
@@ -72,33 +72,99 @@ fetch(api) // recupère les données du service web    //type de requete GET
                     </div>
                   </div>
                 </article>
-                
-                      `; }
+                      `; 
+                    totalQuantity();
+                    totalPrice();
+                    ;}
                 else {
 
                 }
             }})
+//--------------------------------------------------//
+//Avoir la quantité totale des articles//
 
-
-
-//////retirer un produit du panier ///// 
- 
-function removeCanap (product){
-  let panier = getCanap (); // on recupere
-  let suppressionParId = panier.filter (p => p.id =! product.id); 
-  if (suppressionParId =! undefined) {
-
-    localStorage.removeItem(suppressionParId) ;
-
+function totalQuantity(){
+  let quantity = document.querySelectorAll('.itemQuantity'); 
+  let totalQuantity = document.getElementById('totalQuantity');
+  totalQuant = 0;
+  for (let i = 0; i < quantity.length; ++i) {
+      totalQuant += quantity[i].valueAsNumber;  // ValueAsNumber :Une valeur numérique double qui renvoie la valeur de l'élément interprété dans l'ordre comme : une valeur temporelle, un nombre, ou NaN si la conversion est impossible
   }
+  totalQuantity.innerText = totalQuant;
+}
+//--------------------------------------------------//
+// fonction de  qui affiche le prix total // 
+
+function totalPrice(){
+  
+  //let price = panier[i].quantity*value[indexApi].price
+  let allPrices = document.querySelectorAll('.cart__item__content__description p:last-child'); //COMMENT PRENDRE JUSTE LE P AVEC LE PRIX QU'IL Y A DANS LE HTML??????
+  //productItemContentTitlePrice.appendChild(productPrice);
+  let totPrice = document.querySelector('#totalPrice');
+  totalPrices = 0;
+  for (let i = 0; i < allPrices.length; ++i) {
+    totalPrices += parseInt(allPrices[i].innerHTML);  // ValueAsNumber :Une valeur numérique double qui renvoie la valeur de l'élément interprété dans l'ordre comme : une valeur temporelle, un nombre, ou NaN si la conversion est impossible
+  } 
+  totPrice.innerText = totalPrices;
+  console.log("audrey"+totalPrices);
+}
+//--------------------------------------------------------------//
+//Changer la quantité du panier//
+
+
+// Delete item from basket after clicking suppres button
+//function deleteFromItem (itemId, itemColor) {
+  //let panier = getCanap ();
+  //let productHtmlArticle = document.querySelectorAll('.itemQuantity')[i].closest('article');
+ // let itemId = productHtmlArticle.dataset.id;
+  //let itemColor = productHtmlArticle.dataset.color;
+  
+ // for (item of panier) {
+   // if (item.id == itemId && item.color == itemColor) {
+      //panier.splice(panier.indexOf(item), 1);
+     // saveBasket(panier);
+      //return
+    //}
+  //}
+//}
+ 
+  //Event pour ajouter un canap
+let supprimerItem = document.getElementsByClassName("deleteItem");
+  //On rajoute l'évent click au bouton addToCart, et ça va call la fonction addCanap
+supprimerItem.addEventListener("click", removeCanap);
+
+console.log ("titi" + removeFromId)
+
+
+function removeFromId (){
+  let panier = getCanap (); // on recupere
+
+  let removeById = panier.findIndex(p => p.id =! p.panier.id );  //on conserve tout les autres id
+  if(removeById != -1) {
+    localStorage.removeItem(panier) ; 
+  }
+
   saveCanap(canap) ;
 }
 
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------//
 //////création de la fonction pour sauvegarder le produit dans un panier ! //////
 
 function saveCanap (canap ) {  //on enregistre le tableau dans le local storage
   localStorage.setItem("canap", JSON.stringify(canap)) ;   // transforme en chaine de caractère
 }
+
+
+//------------------------------------------------------------------//
 
 //////création de la fonction pour supprimer le panier //////
 
@@ -107,51 +173,19 @@ function removeCanap (){
   
 }
 
-
-
-
-  //Event pour ajouter un canap
-let supprimerItems = document.getElementsByClassName("deleteItem");
-  //On rajoute l'évent click au bouton addToCart, et ça va call la fonction addCanap
-supprimerItems.addEventListener("on click", removeCanap);
-
-console.log ("titi" + supprimerItems)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   //retirer de la quantité
-  
-  function changeQuantity (product,quantity) {
-    let canap = getCanap () ; 
-    let foundProduct = canap.find(p => p.id == product.id);  //je cherche dans mon panier si il y a un id qui = a l'id du product
-      if (foundProduct != undefined) {
-        foundProduct.quantity += quantity ;
-        if(foundProduct.quantity <=0 ){   //pour pas avoir une quantité negative
-          removeCanap (foundProduct);
-        } else{
-          saveCanap(canap);
-        }
-      }
-      
-    }
+//function changeQuantity (product,quantity) {
+  //let canap = getCanap () ; 
+  //let foundProduct = canap.find(p => p.id == product.id);  //je cherche dans mon panier si il y a un id qui = a l'id du product
+    //if (foundProduct != undefined) {
+      //foundProduct.quantity += quantity ;
+      //if(foundProduct.quantity <=0 ){   //pour pas avoir une quantité negative
+        //removeCanap (foundProduct);
+      //} else{
+        //saveCanap(canap);
+      //}} }
+
+
   //pour calcul de la quantité 
   
   //function getNumberProduct {

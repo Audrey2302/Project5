@@ -96,7 +96,7 @@ function getCanap() {
 
   //ajout dans le panier
 
-function addCanap (product, color, quantity) {
+function addCanap (product) {
 //Ici on crée une interface, se sera l'ajout de la quantité ou de la couleur par l'utilisateur 
   let itemCanap = {};
     //On récup le canap en question
