@@ -12,7 +12,7 @@ function getCanap() {
 } 
 
 let panier = getCanap ();
-console.log ( (panier)); 
+
 
 
 
@@ -35,20 +35,16 @@ fetch(api) // recupère les données du service web    //type de requete GET
     
     let positionCart = document.getElementById("cart__items") // j'ai recuperé la liste items et je la met dans product.
 
-   
-
-
           for (let i = 0; i < panier.length; i++) {  //longueur du tableau (debut, a la fin, à chaque boucle on augmente i une fois)
+
             let id = panier[i].id;
             let color = panier[i].color; //.color = une clé
             
             let indexApi = value.findIndex(p => ((p._id === panier[i].id) )); //_id c'est la clé dans mon api et colors aussi  //variable que j'ai definie dans scriptjs
             console.log (value);
-            console.log("croute" + indexApi)
+            console.log("++" + indexApi)
 
                 if ( indexApi != -1) {
-
-            
 
                   positionCart.innerHTML  +=  `  
                   <article class="cart__item" data-id="${id}" data-color="${color}">
@@ -73,21 +69,28 @@ fetch(api) // recupère les données du service web    //type de requete GET
                   </div>
                 </article>
                       `; 
+                    //fonction pour la quantité totale
                     totalQuantity();
+                    //fonction pour le prix total 
                     totalPrice();
+                    //action du bouton supprimer 
+                    
                     ;}
                 else {
 
                 }
-            }})
+            }
+          removeFromId();  
+          modifQuantity();
+          })
 //--------------------------------------------------//
 //Avoir la quantité totale des articles//
 
 function totalQuantity(){
-  let quantity = document.querySelectorAll('.itemQuantity'); 
-  let totalQuantity = document.getElementById('totalQuantity');
-  totalQuant = 0;
-  for (let i = 0; i < quantity.length; ++i) {
+  let quantity = document.querySelectorAll('.itemQuantity');  //on prend la class ou il y a les quantités   // le point veut dire que c'est une class  
+  let totalQuantity = document.getElementById('totalQuantity');  //on prend la lass ou on veut afficher les quantités totales 
+  totalQuant = 0;                                                //Au debut le totalQuant =0 
+  for (let i = 0; i < quantity.length; ++i) {                    // on fait une boucle pour toute les parties du tableau 
       totalQuant += quantity[i].valueAsNumber;  // ValueAsNumber :Une valeur numérique double qui renvoie la valeur de l'élément interprété dans l'ordre comme : une valeur temporelle, un nombre, ou NaN si la conversion est impossible
   }
   totalQuantity.innerText = totalQuant;
@@ -106,10 +109,75 @@ function totalPrice(){
     totalPrices += parseInt(allPrices[i].innerHTML);  // ValueAsNumber :Une valeur numérique double qui renvoie la valeur de l'élément interprété dans l'ordre comme : une valeur temporelle, un nombre, ou NaN si la conversion est impossible
   } 
   totPrice.innerText = totalPrices;
-  console.log("audrey"+totalPrices);
 }
 //--------------------------------------------------------------//
-//Changer la quantité du panier//
+//Supprimer dans le panier//
+
+function removeFromId (){
+  console.log(panier);
+  let supprimerItem = document.getElementsByClassName("deleteItem");
+  
+  for (let i = 0; i < supprimerItem.length; i++) {
+    supprimerItem[i].addEventListener("click", function(){
+      let close = this.closest("article")
+      let id = close.getAttribute("data-id")
+      let color = close.getAttribute("data-color")
+      panier = panier.filter(p => p.id != id && p.color != color ); //ON CRée un nouveau tableau avec tout les id et les color different de celui on a cliqué 
+
+       // mise à jour du localstorage
+      localStorage.setItem("canap", JSON.stringify(panier));
+            
+       //Alerte produit supprimé
+       //alert("Ce produit a été supprimé ");
+      document.location.reload(); 
+});
+ }}
+//--------------------------------------------------------------//
+//Pour changer la quantité//
+
+
+function modifQuantity () {
+
+  let modifItem = document.getElementsByClassName("itemQuantity");
+  console.log(modifItem)
+  for (let i = 0; i < modifItem.length; i++) {
+    modifItem[i].addEventListener("change" , function(){
+      let close = this.closest("article")
+      let id = close.getAttribute("data-id")
+      let color = close.getAttribute("data-color")
+
+      let foundItem = panier.findIndex(p => p.id == id && p.color == color)
+// On veut maintenant que dans le tableau la partie quantity s'additionne a la 
+      panier[foundItem].quantity = this.valueAsNumber;
+
+      localStorage.setItem("canap", JSON.stringify(panier));
+
+      document.location.reload(); 
+    })
+  }
+}
+
+
+
+//function btnSupp(event){
+  /*                         let supprimeArticle = document.querySelectorAll("article")
+                          //let btnsupprimer = document.querySelectorAll(".deleteItem")
+                          console.log(event);
+                          for (let i = 0; i < supprimeArticle.length; i++) {
+                            let panier = getCanap (); // on recupere
+                            let id = panier[i].id;
+                            let color = panier[i].color;
+
+                            panier = panier.filter(p => p.id =! id && p.color !== color );   //Selection de l'element à supprimer en fonction de son id et sa couleur //on conserve tout les autres id
+                          
+                            supprimeArticle[i] =(localStorage.removeItem("canap")) ;    //supprimeItem[i] -- c'est les differents bouton supprime 
+                              //localStorage.removeItem("canap") ;
+                              //JSON.parse(localStorage.getItem("canap"))  
+                          }
+                        } */
+
+
+
 
 
 // Delete item from basket after clicking suppres button
@@ -128,27 +196,10 @@ function totalPrice(){
   //}
 //}
  
-  //Event pour ajouter un canap
-let supprimerItem = document.getElementsByClassName("deleteItem");
+
+//let supprimerItem = document.getElementsByClassName("cart__item__content__settings__delete");
   //On rajoute l'évent click au bouton addToCart, et ça va call la fonction addCanap
-supprimerItem.addEventListener("click", removeCanap);
-
-console.log ("titi" + removeFromId)
-
-
-function removeFromId (){
-  let panier = getCanap (); // on recupere
-
-  let removeById = panier.findIndex(p => p.id =! p.panier.id );  //on conserve tout les autres id
-  if(removeById != -1) {
-    localStorage.removeItem(panier) ; 
-  }
-
-  saveCanap(canap) ;
-}
-
-
-
+//upprimerItem.addEventListener("click", removeFromId);
 
 
 
@@ -169,8 +220,7 @@ function saveCanap (canap ) {  //on enregistre le tableau dans le local storage
 //////création de la fonction pour supprimer le panier //////
 
 function removeCanap (){
-  localStorage.removeItem(panier) ; 
-  
+  localStorage.removeItem("canap") ; 
 }
 
   //retirer de la quantité

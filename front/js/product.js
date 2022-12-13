@@ -151,10 +151,3 @@ function addCanap (product) {
   saveCanap(canapList) ;
 
 }
-
-
-
-
-
-
- 
