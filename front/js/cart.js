@@ -55,7 +55,7 @@ fetch(api) // recupère les données du service web    //type de requete GET
                     <div class="cart__item__content__description">
                       <h2>${value[indexApi].name}</h2>
                       <p>${panier[i].color}</p>
-                      <p id="price">${panier[i].quantity*value[indexApi].price}</p>  
+                      <p id="price">${value[indexApi].price}</p>  
                     </div>
                     <div class="cart__item__content__settings">
                       <div class="cart__item__content__settings__quantity">
@@ -73,20 +73,24 @@ fetch(api) // recupère les données du service web    //type de requete GET
                     totalQuantity();
                     //fonction pour le prix total 
                     totalPrice();
-                    //action du bouton supprimer 
+                    
                     
                     ;}
                 else {
 
                 }
             }
-          removeFromId();  
+          //action du bouton supprimer 
+          removeFromId(); 
+          //Action pour le changement de quantité 
           modifQuantity();
           })
+
+
 //--------------------------------------------------//
 //Avoir la quantité totale des articles//
 
-function totalQuantity(){
+function totalQuantity(){ // 1412 actualiser avec le LS
   let quantity = document.querySelectorAll('.itemQuantity');  //on prend la class ou il y a les quantités   // le point veut dire que c'est une class  
   let totalQuantity = document.getElementById('totalQuantity');  //on prend la lass ou on veut afficher les quantités totales 
   totalQuant = 0;                                                //Au debut le totalQuant =0 
@@ -98,22 +102,22 @@ function totalQuantity(){
 //--------------------------------------------------//
 // fonction de  qui affiche le prix total // 
 
-function totalPrice(){
-  
+function totalPrice(){  //1412 Actualiser en fonction du localstorage 
+
+  let quantity = document.querySelectorAll('.itemQuantity');
   //let price = panier[i].quantity*value[indexApi].price
-  let allPrices = document.querySelectorAll('.cart__item__content__description p:last-child'); //COMMENT PRENDRE JUSTE LE P AVEC LE PRIX QU'IL Y A DANS LE HTML??????
+  let price = document.querySelectorAll('.cart__item__content__description p:last-child'); //COMMENT PRENDRE JUSTE LE P AVEC LE PRIX QU'IL Y A DANS LE HTML??????
   //productItemContentTitlePrice.appendChild(productPrice);
-  let totPrice = document.querySelector('#totalPrice');
+  let totPrice = document.querySelector('#totalPrice');  //Pour l'affichage 
   totalPrices = 0;
-  for (let i = 0; i < allPrices.length; ++i) {
-    totalPrices += parseInt(allPrices[i].innerHTML);  // ValueAsNumber :Une valeur numérique double qui renvoie la valeur de l'élément interprété dans l'ordre comme : une valeur temporelle, un nombre, ou NaN si la conversion est impossible
-  } 
+  for (let i = 0; i < quantity.length; ++i) {
+    totalPrices += (parseInt(quantity[i].value) * parseInt(price[i].innerText)); }
   totPrice.innerText = totalPrices;
 }
 //--------------------------------------------------------------//
 //Supprimer dans le panier//
 
-function removeFromId (){
+function removeFromId (){ //1412 supprimer l'element close sans le roload 
   console.log(panier);
   let supprimerItem = document.getElementsByClassName("deleteItem");
   
@@ -122,14 +126,16 @@ function removeFromId (){
       let close = this.closest("article")
       let id = close.getAttribute("data-id")
       let color = close.getAttribute("data-color")
-      panier = panier.filter(p => p.id != id && p.color != color ); //ON CRée un nouveau tableau avec tout les id et les color different de celui on a cliqué 
-
+      //close.remove();
+      panier = panier.filter(p => p.id != id || p.color != color ); //ON CRée un nouveau tableau avec tout les id et les color different de celui on a cliqué 
        // mise à jour du localstorage
       localStorage.setItem("canap", JSON.stringify(panier));
-            
-       //Alerte produit supprimé
-       //alert("Ce produit a été supprimé ");
-      document.location.reload(); 
+
+      close.remove(); //supprime le close selectionné !!
+
+      totalPrice();
+      totalQuantity();
+
 });
  }}
 //--------------------------------------------------------------//
@@ -147,101 +153,214 @@ function modifQuantity () {
       let color = close.getAttribute("data-color")
 
       let foundItem = panier.findIndex(p => p.id == id && p.color == color)
-// On veut maintenant que dans le tableau la partie quantity s'additionne a la 
+
+
       panier[foundItem].quantity = this.valueAsNumber;
+      console.log(this.valueAsNumber)
 
       localStorage.setItem("canap", JSON.stringify(panier));
 
-      document.location.reload(); 
+      totalPrice();
+      totalQuantity();
+      
     })
   }
 }
+//--------------------------------------------------------------//
+//Les Regex //
 
+let nameRegex = new RegExp("^[A-Za-zàâäéèêëïîôöùûüç'-]+$"); 
+let emailRegex = new RegExp('^[A-Za-z0-9.-_]+[@]{1}[A-Za-z0-9.-_]+[.]{1}[a-z]{2,}$');
+let cityRegex = new RegExp("^[A-Za-zàâäéèêëïîôöùûüç '-]+$");
+let addressRegex = new RegExp ("^[0-9]{1,3}(?:(?:[,. ]){1}[-A-Za-zàâäéèêëïîôöùûüç]+)+");
+//--------------------------------------------------------------//
+//validation du prenom 
 
-
-//function btnSupp(event){
-  /*                         let supprimeArticle = document.querySelectorAll("article")
-                          //let btnsupprimer = document.querySelectorAll(".deleteItem")
-                          console.log(event);
-                          for (let i = 0; i < supprimeArticle.length; i++) {
-                            let panier = getCanap (); // on recupere
-                            let id = panier[i].id;
-                            let color = panier[i].color;
-
-                            panier = panier.filter(p => p.id =! id && p.color !== color );   //Selection de l'element à supprimer en fonction de son id et sa couleur //on conserve tout les autres id
-                          
-                            supprimeArticle[i] =(localStorage.removeItem("canap")) ;    //supprimeItem[i] -- c'est les differents bouton supprime 
-                              //localStorage.removeItem("canap") ;
-                              //JSON.parse(localStorage.getItem("canap"))  
-                          }
-                        } */
-
-
-
-
-
-// Delete item from basket after clicking suppres button
-//function deleteFromItem (itemId, itemColor) {
-  //let panier = getCanap ();
-  //let productHtmlArticle = document.querySelectorAll('.itemQuantity')[i].closest('article');
- // let itemId = productHtmlArticle.dataset.id;
-  //let itemColor = productHtmlArticle.dataset.color;
+function ValidationFirstname () {
+  let messageErrorFirstname = document.getElementById("firstNameErrorMsg");
+  let firstname = document.getElementById("firstName");
   
- // for (item of panier) {
-   // if (item.id == itemId && item.color == itemColor) {
-      //panier.splice(panier.indexOf(item), 1);
-     // saveBasket(panier);
-      //return
-    //}
-  //}
-//}
- 
-
-//let supprimerItem = document.getElementsByClassName("cart__item__content__settings__delete");
-  //On rajoute l'évent click au bouton addToCart, et ça va call la fonction addCanap
-//upprimerItem.addEventListener("click", removeFromId);
-
-
-
-
-
-
-
-//---------------------------------------------------------------//
-//////création de la fonction pour sauvegarder le produit dans un panier ! //////
-
-function saveCanap (canap ) {  //on enregistre le tableau dans le local storage
-  localStorage.setItem("canap", JSON.stringify(canap)) ;   // transforme en chaine de caractère
+  if (nameRegex.test(firstname.value))  {//.test(input) //1412 le seul truc qui faut changer c'est dans la parenthese faire une recherche de l'id firstname 
+    messageErrorFirstname.innerHTML = '';
+    return true
+  }
+  else {
+    messageErrorFirstname.innerHTML = 'Erreur';
+    return false
+  }
 }
+//--------------------------------------------------------------//
+//validation du nom 
 
-
-//------------------------------------------------------------------//
-
-//////création de la fonction pour supprimer le panier //////
-
-function removeCanap (){
-  localStorage.removeItem("canap") ; 
+function validationLastName () {
+  let messageErrorLastName = document.getElementById("lastNameErrorMsg");
+  let lastName = document.getElementById("lastName");
+  
+  if (nameRegex.test(lastName.value))  {//.test(input) //1412 le seul truc qui faut changer c'est dans la parenthese faire une recherche de l'id firstname 
+    messageErrorLastName.innerHTML = '';
+    return true
+  }
+  else {
+    messageErrorLastName.innerHTML = 'Erreur';
+    return false
+  }
 }
+//--------------------------------------------------------------//
+//validation de l'adresse 
 
-  //retirer de la quantité
-//function changeQuantity (product,quantity) {
-  //let canap = getCanap () ; 
-  //let foundProduct = canap.find(p => p.id == product.id);  //je cherche dans mon panier si il y a un id qui = a l'id du product
-    //if (foundProduct != undefined) {
-      //foundProduct.quantity += quantity ;
-      //if(foundProduct.quantity <=0 ){   //pour pas avoir une quantité negative
-        //removeCanap (foundProduct);
-      //} else{
-        //saveCanap(canap);
-      //}} }
+function validationAdress () {
+  let messageErrorAdress = document.getElementById("addressErrorMsg");
+  let adress = document.getElementById("address");
+  
+  if (addressRegex .test(adress.value))  {//.test(input) //1412 le seul truc qui faut changer c'est dans la parenthese faire une recherche de l'id firstname 
+    messageErrorAdress.innerHTML = '';
+    return true
+  }
+  else {
+    messageErrorAdress.innerHTML = 'Erreur';
+    return false
+  }
+}
+//--------------------------------------------------------------//
+//validation de l'adresse 
+
+function validationCity () {
+  let messageErrorCity = document.getElementById("cityErrorMsg");
+  let city = document.getElementById("city");
+  
+  if (cityRegex .test(city.value))  {//.test(input) //1412 le seul truc qui faut changer c'est dans la parenthese faire une recherche de l'id firstname 
+    messageErrorCity.innerHTML = '';
+    return true
+  }
+  else {
+    messageErrorCity.innerHTML = 'Erreur';
+    return false
+  }
+}
+//--------------------------------------------------------------//
+//validation du mail 
+
+function validationMail () {
+  let messageErrorMail = document.getElementById("emailErrorMsg");
+  let mail = document.getElementById("email");
+  
+  if (emailRegex.test(mail.value))  {
+    messageErrorMail.innerHTML = '';
+    return true
+  }
+  else {
+    messageErrorMail.innerHTML = 'Erreur';
+    return false
+  }
+}
+//------------------------------------------------------------//
+//Faire marcher la validation 
+
+let validationDuFormulaire = document.querySelector(".cart__order__form");
+
+validationDuFormulaire.firstName.addEventListener("change", function () {
+  ValidationFirstname();
+});
+validationDuFormulaire.lastName.addEventListener("change", function () {
+  validationLastName();
+});
+validationDuFormulaire.address.addEventListener("change", function () {
+  validationAdress();
+});
+validationDuFormulaire.city.addEventListener("change", function () {
+  validationCity();
+});
+validationDuFormulaire.email.addEventListener("change", function () {
+  validationMail();
+});
 
 
-  //pour calcul de la quantité 
+
+
+
+
+
+
+//--------------------------------------------------------------//
+//Validé la commande//
+
+
+
+//-----------------------------------------------------------------//
+//L'objet contact (à partir des données formulaire et un tableau produit)
+
+
+//La fonction envoieDeLaCommande() permet d'envoyer la commande de l'utilisateur en prenant en compte un paramètre important qui est l'idProduit. Cet idProduit permet l'envoi de la requête ainsi que le contact.
+
+function envoiCommande(){
+
+  let produitDansLocalStorage = JSON.parse(localStorage.getItem("canap"))
+  let products = [] ; //<-- array of product _id
+  for (let i = 0; i < produitDansLocalStorage.length; i++) {
+    products.push(produitDansLocalStorage[i].id)
+  }
+  console.log(products);
+
   
-  //function getNumberProduct {
-    //let canap = getCanap () ;  // on recupere le panier 
-  
-  //}
-  //pour le prix
-  
-  //function getTotalPrice
+  let mail = document.getElementById("email");
+  let city = document.getElementById("city");
+  let adress = document.getElementById("address");
+  let firstname = document.getElementById("firstName");
+  let lastName = document.getElementById("lastName");
+
+  let contact = {  //ca c'est du javascript on veut le transformer en JSON avec la requete post
+    firstName: firstname.value,
+    lastName: lastName.value,
+    address: adress.value,
+    city: city.value ,
+    email: mail.value,
+  }
+
+  const order = { contact, products } ; 
+
+    //Creation de la requete POST pour envoyer 
+
+  fetch("http://localhost:3000/api/products/order", {
+            method: "POST",
+            body: JSON.stringify(order),
+            headers: {
+                'Content-type': 'application/json'
+            },
+        })
+              //console.table(requete)
+            .then((response) => response.json())
+            .then((data) => {
+                  //console.table(data);
+                localStorage.setItem("orderId", data.orderId);
+                document.location.href = `confirmation.html?id=${data.orderId}`;
+              })
+            .catch((erreur) => {
+                alert(`Erreur: ${erreur}`);
+            });
+};
+
+let btnCommander = document.getElementById("order"); 
+btnCommander.addEventListener("click", function(event) {
+  event.preventDefault();// Empêche le rechargement de la page
+  envoiCommande();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
