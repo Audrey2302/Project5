@@ -1,4 +1,5 @@
- 
+//--------------------------------------------------//
+//Faire le lien entre le panier et la page confirmation// 
 var url = new URL(window.location.href);
 
 var urlparams = new URLSearchParams(url.search);
@@ -7,13 +8,9 @@ var id = urlparams.get("id");
 
 var orderId = document.getElementById("orderId");
 
-orderId.innerHTML = id ; 
+orderId.textContent = id ; 
 
-let newurl = "http://localhost:3000/api/products/order"
-
-console.log(newurl)
-
-
+localStorage.clear(); 
   
   
   
